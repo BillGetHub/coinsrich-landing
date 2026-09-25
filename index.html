@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoinsRich — Live Crypto Prices in Your Pocket</title>
+<meta name="description" content="Track 31 cryptocurrencies with live prices, candlestick charts, price alerts, and sparklines.">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 80px 0 60px; text-align: center; }
+  .logo { font-size: 48px; font-weight: 800; color: #00ff88; letter-spacing: -1px; margin-bottom: 16px; }
+  .tagline { font-size: 20px; color: #aaa; max-width: 600px; margin: 0 auto 32px; }
+  .badge { display: inline-block; background: #00ff8822; color: #00ff88; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-bottom: 24px; border: 1px solid #00ff8844; }
+  .btn { display: inline-block; background: #00ff88; color: #0a0a0a; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; }
+  section { padding: 60px 0; border-top: 1px solid #1a1a1a; }
+  h2 { font-size: 32px; margin-bottom: 40px; text-align: center; }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+  .feature { background: #1a1a1a; padding: 28px; border-radius: 12px; border: 1px solid #2a2a2a; }
+  .feature-icon { font-size: 32px; margin-bottom: 12px; }
+  .feature h3 { font-size: 18px; margin-bottom: 8px; color: #00ff88; }
+  .feature p { color: #aaa; font-size: 14px; }
+  .prices { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .price-card { background: #1a1a1a; padding: 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a2a2a; }
+  .price-symbol { font-weight: 700; color: #fff; font-size: 14px; }
+  .price-value { color: #00ff88; font-weight: 600; font-size: 14px; }
+  .price-up { color: #00ff88; }
+  .price-down { color: #ff5555; }
+  .price-change { font-size: 12px; margin-left: 8px; }
+  footer { padding: 40px 0; text-align: center; color: #666; font-size: 14px; border-top: 1px solid #1a1a1a; }
+  footer a { color: #00ff88; text-decoration: none; }
+  .loading { text-align: center; color: #888; padding: 40px; grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="badge">Coming Soon to Google Play</div>
+      <div class="logo">CoinsRich</div>
+      <p class="tagline">Live crypto prices in your pocket. Track 31 coins with candlestick charts, price alerts, and real-time updates.</p>
+      <a href="#prices" class="btn">View Live Prices</a>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+      <h2>Everything You Need</h2>
+      <div class="features">
+        <div class="feature"><div class="feature-icon">📊</div><h3>Live Prices</h3><p>31 cryptocurrencies updated every 10 seconds from Binance.</p></div>
+        <div class="feature"><div class="feature-icon">📈</div><h3>Candlestick Charts</h3><p>1H, 24H, 7D, and 30D intervals with real historical data.</p></div>
+        <div class="feature"><div class="feature-icon">🔔</div><h3>Price Alerts</h3><p>Get notified when prices cross your targets. Above or below.</p></div>
+        <div class="feature"><div class="feature-icon">⚡</div><h3>Lightning Fast</h3><p>Powered by DigitalOcean + Binance API. Always up to date.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="prices">
+    <div class="container">
+      <h2>Live Market Prices</h2>
+      <div id="prices-grid" class="prices"><div class="loading">Loading prices...</div></div>
+    </div>
+  </section>
+
+  <footer><div class="container"><p>© 2026 CoinsRich</p></div></footer>
+
+<script>
+const API = 'https://api.coinsrich.com/api/prices';
+async function loadPrices() {
+  try {
+    const res = await fetch(API);
+    const data = await res.json();
+    const html = Object.entries(data).map(([sym, info]) => {
+      const change = info.change || 0;
+      const isUp = change >= 0;
+      const cls = isUp ? 'price-up' : 'price-down';
+      const arrow = isUp ? '▲' : '▼';
+      const p = info.price >= 1 ? info.price.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : info.price.toPrecision(4);
+      return '<div class="price-card"><span class="price-symbol">' + sym + '</span><span><span class="price-value">$' + p + '</span><span class="price-change ' + cls + '">' + arrow + ' ' + change.toFixed(2) + '%</span></span></div>';
+    }).join('');
+    document.getElementById('prices-grid').innerHTML = html;
+  } catch (e) {
+    document.getElementById('prices-grid').innerHTML = '<div class="loading">Unable to load prices.</div>';
+  }
+}
+loadPrices();
+setInterval(loadPrices, 15000);
+</script>
+</body>
+</html>

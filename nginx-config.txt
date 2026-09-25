@@ -1,0 +1,11 @@
+server {
+    listen 80;
+    server_name coinsrich.com www.coinsrich.com;
+
+    root /var/www/coinsrich;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
